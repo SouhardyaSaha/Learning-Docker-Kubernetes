@@ -1,4 +1,4 @@
-name: Deploy Frontend
+name: Deploy MultiDocker
 on:
   push:
     branches:
@@ -10,13 +10,22 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-      - run: docker build -t souhardya/react-test -f react-app/Dockerfile.dev react-app/.
-      
-      - name: Run Tests
-        run: docker run -e CI=true souhardya/react-test npm test
+      - run: docker build -t souhardya/react-test -f ./multicontainer-code/client/Dockerfile.dev ./client
+      - run: docker run -e CI=true souhardya/react-test npm test
+ 
+      - run: docker build -t souhardya/multi-client-1 ./client
+      - run: docker build -t souhardya/multi-nginx-1 ./nginx
+      - run: docker build -t souhardya/multi-server-1 ./server
+      - run: docker build -t souhardya/multi-worker-1 ./worker
+ 
+      - run: docker push souhardya/multi-client-1
+      - run: docker push souhardya/multi-nginx-1
+      - run: docker push souhardya/multi-server-1
+      - run: docker push souhardya/multi-worker-1
  
       - name: Generate deployment package
-        run: cd react-app && zip -r ../deploy.zip . -x '*.git*'
+        run: cd multicontainer-code && zip -r ../deploy.zip . -x '*.git*'
+ 
  
       - name: Deploy to EB
         uses: einaregilsson/beanstalk-deploy@v21
