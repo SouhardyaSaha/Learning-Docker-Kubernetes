@@ -10,13 +10,13 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-      - run: docker build -t souhardya/react-test -f ./multicontainer-code/client/Dockerfile.dev ./client
+      - run: docker build -t souhardya/react-test -f ./multicontainer-code/client/Dockerfile.dev ./multicontainer-code/client
       - run: docker run -e CI=true souhardya/react-test npm test
  
-      - run: docker build -t souhardya/multi-client-1 ./client
-      - run: docker build -t souhardya/multi-nginx-1 ./nginx
-      - run: docker build -t souhardya/multi-server-1 ./server
-      - run: docker build -t souhardya/multi-worker-1 ./worker
+      - run: docker build -t souhardya/multi-client-1 ./multicontainer-code/client
+      - run: docker build -t souhardya/multi-nginx-1 ./multicontainer-code/nginx
+      - run: docker build -t souhardya/multi-server-1 ./multicontainer-code/server
+      - run: docker build -t souhardya/multi-worker-1 ./multicontainer-code/worker
  
       - run: docker push souhardya/multi-client-1
       - run: docker push souhardya/multi-nginx-1
@@ -26,15 +26,54 @@ jobs:
       - name: Generate deployment package
         run: cd multicontainer-code && zip -r ../deploy.zip . -x '*.git*'
  
+      # - name: Deploy to EB
+      #   uses: einaregilsson/beanstalk-deploy@v18
+      #   with:
+      #     aws_access_key: ${{ secrets.AWS_ACCESS_KEY }}
+      #     aws_secret_key: ${{ secrets.AWS_SECRET_KEY }}
+      #     application_name: multi-gh
+      #     environment_name: Multigh-env
+      #     existing_bucket_name: elasticbeanstalk-us-east-1-923445559289
+      #     region: us-east-1
+      #     version_label: ${{ github.sha }}
+      #     deployment_package: deploy.zip
+
+
+
+
+
+
+
+
+
+# name: Deploy Frontend (Single Container)
+# on:
+#   push:
+#     branches:
+#       - main
  
-      - name: Deploy to EB
-        uses: einaregilsson/beanstalk-deploy@v21
-        with:
-          aws_access_key: ${{ secrets.AWS_ACCESS_KEY }}
-          aws_secret_key: ${{ secrets.AWS_SECRET_KEY }}
-          application_name: docker-react
-          environment_name: Docker-react-env
-          existing_bucket_name: elasticbeanstalk-eu-north-1-730335432818
-          region: eu-north-1
-          version_label: ${{ github.sha }}
-          deployment_package: deploy.zip
+# jobs:
+#   build:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v3
+#       - run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+#       - run: docker build -t souhardya/react-test -f react-app/Dockerfile.dev react-app/.
+      
+#       - name: Run Tests
+#         run: docker run -e CI=true souhardya/react-test npm test
+ 
+#       - name: Generate deployment package
+#         run: cd react-app && zip -r ../deploy.zip . -x '*.git*'
+ 
+#       - name: Deploy to EB
+#         uses: einaregilsson/beanstalk-deploy@v21
+#         with:
+#           aws_access_key: ${{ secrets.AWS_ACCESS_KEY }}
+#           aws_secret_key: ${{ secrets.AWS_SECRET_KEY }}
+#           application_name: docker-react
+#           environment_name: Docker-react-env
+#           existing_bucket_name: elasticbeanstalk-eu-north-1-730335432818
+#           region: eu-north-1
+#           version_label: ${{ github.sha }}
+#           deployment_package: deploy.zip
