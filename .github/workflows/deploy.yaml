@@ -24,7 +24,7 @@ jobs:
       - run: docker push souhardya/multi-worker-1
  
       - name: Generate deployment package
-        run: cd multicontainer-code && zip -r ../deploy.zip . -x '*.git*'
+        run: cd multicontainer-code && zip -r ../multi_deploy.zip . -x '*.git*'
  
       - name: Deploy to EB
         uses: einaregilsson/beanstalk-deploy@v18
@@ -36,7 +36,7 @@ jobs:
           existing_bucket_name: elasticbeanstalk-eu-north-1-730335432818
           region: eu-north-1
           version_label: ${{ github.sha }}
-          deployment_package: deploy.zip
+          deployment_package: multi_deploy.zip
 
 
 
@@ -64,7 +64,7 @@ jobs:
 #         run: docker run -e CI=true souhardya/react-test npm test
  
 #       - name: Generate deployment package
-#         run: cd react-app && zip -r ../deploy.zip . -x '*.git*'
+#         run: cd react-app && zip -r ../multi_deploy.zip . -x '*.git*'
  
 #       - name: Deploy to EB
 #         uses: einaregilsson/beanstalk-deploy@v21
@@ -76,4 +76,4 @@ jobs:
 #           existing_bucket_name: elasticbeanstalk-eu-north-1-730335432818
 #           region: eu-north-1
 #           version_label: ${{ github.sha }}
-#           deployment_package: deploy.zip
+#           deployment_package: multi_deploy.zip
